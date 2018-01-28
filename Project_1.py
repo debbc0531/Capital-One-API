@@ -21,4 +21,4 @@ response = requests.get(
 if response.status_code == 200:
 	print('success')
 
-print(response.content)
+#print(response.content)
