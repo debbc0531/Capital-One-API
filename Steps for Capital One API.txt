@@ -1,0 +1,16 @@
+Steps to post data and then get the data
+
+1) Get account ID via Customer ID
+GET /customers/{id}/accounts
+
+2) Post withdrawals via account ID
+POST /accounts/{id}/withdrawals
+
+3) Get Withdrawals via account ID
+GET /accounts/{id}/withdrawals
+
+5) Post purchases via account ID
+POST /accounts/{id}/purchases
+
+4) Get Purchases via account ID
+GET /accounts/{id}/purchases

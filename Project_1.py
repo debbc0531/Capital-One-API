@@ -4,36 +4,87 @@
 import requests
 import json
 
-customerId = '5a5992d95eaa612c093b0c0a'
+# My apiKey
 apiKey = '4a887901314de2781ea7ef954aca19e8'
 
-url = 'http://api.reimaginebanking.com/enterprise/accounts?key=4a887901314de2781ea7ef954aca19e8'.format(customerId,apiKey)
+# My api KEy Value Pair
+payload = {'key': apiKey}
 
-payload = {
-  "type": "Credit Card",
-  "bill_ids": [
-    "string"
-  ],
-  "_id": "string",
-  "rewards": 0,
-  "customer_id": "string",
-  #"nickname": "string",
-  "balance": 0
-}
-# Create a Savings Account
-response = requests.get(
-	url,
-	data=json.dumps(payload),
-	headers={'content-type':'application/json'},
-	)
+# Default URL
+apiEnterpriseUrl = 'http://api.reimaginebanking.com/enterprise'
 
-if response.status_code == 200:
-	print('success')
+# Get Accounts via enterprise
+allAccountsUrl = apiEnterpriseUrl + '/accounts'
 
-data = response.json()
-print(data["results"][:10])
+accountsRequest = requests.get(allAccountsUrl, params=payload)
 
-#for i in range(0,50):
-#   print(data["results"][i])
+if accountsRequest.status_code == 200:
+	print('Got enterprise accounts')
 
-print(len(data["results"][:3]))
+# Get all Withdrawals via enterprise
+allWithdrawalsUrl = apiEnterpriseUrl + '/withdrawals'
+withdrawalRequest = requests.get(allWithdrawalsUrl, params=payload)
+
+if withdrawalRequest.status_code == 200:
+	print('Got all withdrawals')
+
+# Parse data from withdrawals
+withdrawalData = withdrawalRequest.json()
+withdrawalResults = withdrawalData["results"]
+
+# Get transfers
+allTransfersUrl = apiEnterpriseUrl +'/transfers'
+transfersRequest = requests.get(allTransfersUrl,params=payload)
+
+if transfersRequest.status_code == 200:
+	print ('Got all transfers')
+
+# Parse data from transfers
+transfersData = transfersRequest.json()
+transfersResults = transfersData['results']
+
+#############################################################################################
+
+# Get first payer ID
+payer1ID = withdrawalResults[0]['payer_id']
+
+# Get customer info from payer ID
+getCustomerByIDURL = apiEnterpriseUrl+ '/customers/{}'.format(payer1ID)
+custResponse = requests.get(getCustomerByIDURL, params=payload)
+
+# Check if success
+if custResponse.status_code == 200:
+	print('Successful customer account retrieved')
+
+##############################################################################################
+
+# Parse data from accounts
+accountsData = accountsRequest.json()
+accountsResults = accountsData["results"]
+
+# Get first ID that isn't blank
+for i in range(0, len(accountsData["results"])):
+	account = accountsData["results"][i]
+	custID = account["_id"]
+
+	# Get customer from API
+	getCustomerByIDURL = 'http://api.reimaginebanking.com/enterprise/customers/{}'.format(custID)
+	custResponse = requests.get(getCustomerByIDURL, params=payload)
+
+	# Check if success
+	if custResponse.status_code == 200:
+		print('Successful customer account retrieved')
+
+	# Check if body is empty
+	if custResponse.json() is not None:
+		print('Theres something here!')
+		break
+	else:
+		print('response is empty')
+
+	# Get transactions of customer
+	print('End')
+
+
+
+
