@@ -14,3 +14,13 @@ POST /accounts/{id}/purchases
 
 4) Get Purchases via account ID
 GET /accounts/{id}/purchases
+
+5) Generating fake purchases
+You can get all merchants in the database withdrawals
+GET /merchants
+
+And with each merchant, it will have a location! You just need to search merchant by ID from the purchase
+information.
+
+When generating fake purchases, choose a merchant at random (or on purpose) and use that as merchant ID.
+THen put a random amount with random date or whatever and post it.
